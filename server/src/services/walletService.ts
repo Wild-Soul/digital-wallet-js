@@ -11,6 +11,13 @@ import {
   InvalidArgumentError
 } from '../errors';
 
+/**
+ * Sets up a new wallet with provided initial balance and name.
+ * The initial balance can be negative (maybe for some bad user behaviour in th past?).
+ * @param data Payload to setup the wallet, initial balance and name.
+ * @param logger Winston logger instance, it'll be used for logging.
+ * @returns Returns a promise with wallet and transaction details.
+ */
 export const setupWallet = async (data: SetupWalletRequest, logger: Logger): Promise<{
   wallet: IWallet;
   transaction: ITransaction;
@@ -51,7 +58,15 @@ export const setupWallet = async (data: SetupWalletRequest, logger: Logger): Pro
   }
 };
 
-export const transact = async (walletId: string, data: TransactRequest): Promise<{
+/**
+ * Creates a new transaction to the target wallet.
+ * The initial balance can be negative (maybe for some bad user behaviour in th past?).
+ * @param walletId Id of the wallet where transaction should be reflected.
+ * @param data Payload for transaction request, contains amount and description.
+ * @param logger Winston logger instance, it'll be used for logging.
+ * @returns Returns a promise with wallet and transaction details.
+ */
+export const transact = async (walletId: string, data: TransactRequest, logger: Logger): Promise<{
   wallet: IWallet;
   transaction: ITransaction;
 }> => {
@@ -87,6 +102,7 @@ export const transact = async (walletId: string, data: TransactRequest): Promise
 
     return { wallet, transaction };
   } catch (error) {
+    logger.error(`[Transact] error: ${(error as Error).message}`)
     await session.abortTransaction();
     session.endSession();
     if (error instanceof ResourceNotFoundError || error instanceof InsufficientFundsError) {
@@ -96,19 +112,32 @@ export const transact = async (walletId: string, data: TransactRequest): Promise
   }
 };
 
-export const getTransactions = async (walletId: string, skip: number, limit: number): Promise<ITransaction[]> => {
+/**
+ * Gets list of transactions made to a wallet.
+ * @param walletId Id of the wallet.
+ * @param skip Initial records to skip.
+ * @param limit Maximum number of records to be fetched.
+ * @param logger Winston logger instance.
+ * @returns List of transactions.
+ */
+export const getTransactions = async (walletId: string, skip: number, limit: number, logger: Logger): Promise<ITransaction[]> => {
   try {
     return await transactionDao.findTransactions(walletId, skip, limit);
   } catch (error) {
+    logger.error(`[Get transactions] error: ${(error as Error).message}`)
     throw new DatabaseError('fetching transactions');
   }
 };
 
-export const getWallet = async (id: string, session?: mongoose.ClientSession): Promise<IWallet> => {
+/**
+ * Gets the details of a wallet.
+ * @param id Wallet id.
+ * @param logger Winston logger instance.
+ * @returns Wallet details.
+ */
+export const getWallet = async (id: string, logger: Logger): Promise<IWallet> => {
   // Since this is a get walled by id operation, if user doens't provide any session just create one (it's ok for not being in transaction)
-  if (!session) {
-    session = await mongoose.startSession();
-  }
+  const session = await mongoose.startSession();
   try {
     const wallet = await walletDao.findWalletById(id, session);
     if (!wallet) {
@@ -116,6 +145,7 @@ export const getWallet = async (id: string, session?: mongoose.ClientSession): P
     }
     return wallet;
   } catch (error) {
+    logger.error(`[Get wallet details] error: ${(error as Error).message}`)
     if (error instanceof ResourceNotFoundError) {
       throw error;
     }

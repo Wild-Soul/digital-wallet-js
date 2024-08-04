@@ -42,7 +42,7 @@ export const transact = async (req: Request<{ walletId: string }, {}, TransactRe
       controller: 'transact',
       body: req.body,
     })}`);
-    const result = await walletService.transact(req.params.walletId, req.body);
+    const result = await walletService.transact(req.params.walletId, req.body, logger);
     res.status(200).json({
       balance: result.wallet.balance,
       transactionId: result.transaction._id
@@ -68,7 +68,7 @@ export const getTransactions = async (req: Request<{}, {}, {}, GetTransactionsQu
       query: req.query,
     })}`);
     const { walletId, skip = '0', limit = '10' } = req.query;
-    const transactions = await walletService.getTransactions(walletId, parseInt(skip), parseInt(limit));
+    const transactions = await walletService.getTransactions(walletId, parseInt(skip), parseInt(limit), logger);
     res.status(200).json(transactions);
   } catch (error) {
     if (error instanceof DatabaseError) {
@@ -86,7 +86,7 @@ export const getWallet = async (req: Request<{ id: string }>, res: Response): Pr
       controller: 'getTransactions',
       params: req.params,
     })}`);
-    const wallet = await walletService.getWallet(req.params.id);
+    const wallet = await walletService.getWallet(req.params.id, logger);
     res.status(200).json({
       id: wallet._id,
       balance: wallet.balance,
