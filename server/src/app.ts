@@ -35,7 +35,7 @@ class App {
     this.server.use(cors(corsOptions));
 
     // sets http headers for response.
-    this.server.use(helmet());
+    // this.server.use(helmet());
     this.server.use(express.json());
     
     this.server.all('/*', (req, res, next) => {
