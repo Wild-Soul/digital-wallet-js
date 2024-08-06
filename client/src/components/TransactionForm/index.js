@@ -9,7 +9,11 @@ function TransactionForm({ onTransaction }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onTransaction(Number(amount), description, isCredit ? 'CREDIT' : 'DEBIT');
+    let transactAmount = amount;
+    if (!isCredit) {
+      transactAmount *= -1;
+    }
+    onTransaction(Number(transactAmount), description ?? '');
     setAmount(0);
   };
 
@@ -21,6 +25,9 @@ function TransactionForm({ onTransaction }) {
         type="number"
         value={amount}
         onChange={(e) => setAmount(e.target.value)}
+        InputProps={{
+          inputProps: { min: 0 }
+        }}
         required
         fullWidth
         margin="normal"
@@ -30,7 +37,6 @@ function TransactionForm({ onTransaction }) {
         type="text"
         value={description}
         onChange={(e) => setDescription(e.target.value)}
-        required
         fullWidth
         margin="normal"
       />

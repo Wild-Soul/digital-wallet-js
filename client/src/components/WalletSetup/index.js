@@ -24,6 +24,9 @@ function WalletSetup({ onSetup }) {
       <TextField
         label="Initial Balance"
         type="number"
+        InputProps={{
+          inputProps: { min: 0 }
+        }}
         value={initialBalance}
         onChange={(e) => setInitialBalance(Number(e.target.value))}
         fullWidth

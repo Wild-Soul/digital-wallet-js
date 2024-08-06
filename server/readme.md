@@ -27,17 +27,6 @@ There are two ways to go about it
 5. Build for production: `npm run build`.
 6. Run production server: `npm run start:prd`.
 
-### Docker based setup
-
-1. Building Docker image
-    - Clone the repository.
-    - Make sure docker daemon is running.
-    - Build the docker image using following command, run the below command from root directory of app (server):
-        - ```docker build -t digital-wallet-server:1.0  --platform linux/amd64 ./deploy/ --no-cache```
-        - platform part is only needed if you're using apple silicon chip.
-2. Run the following command from root:
-    - ```docker compose up```
-
 ## Project structure
 ```
 server/

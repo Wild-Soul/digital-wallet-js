@@ -1,8 +1,7 @@
 // This script is used to initialize the database, create service user and collection/indices if needed.
 
-db = db.getSiblingDB('wallet-db'); // Create or switch to 'mydatabase'
+db = db.getSiblingDB('wallet-db');
 
-// Create a user with readWrite access to 'mydatabase'
 db.createUser({
   user: 'wallet-serviceuser',
   pwd: 'password',
@@ -10,4 +9,3 @@ db.createUser({
 });
 
 // Additional setup can be done here, like creating collections or indexes
-// db.createCollection('mycollection');

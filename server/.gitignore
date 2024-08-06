@@ -11,4 +11,5 @@ npm-debug.log*
 
 # Build files and editor files
 build/*
+dist/*
 .vscode/*
